@@ -7,6 +7,7 @@ export class AudioProcessor {
   private stream: MediaStream | null = null;
   private processor: ScriptProcessorNode | null = null;
   private source: MediaStreamAudioSourceNode | null = null;
+  private analyser: AnalyserNode | null = null;
 
   constructor(private sampleRate: number = 16000) {}
 
@@ -15,8 +16,9 @@ export class AudioProcessor {
     this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     this.source = this.audioContext.createMediaStreamSource(this.stream);
     
-    // Using ScriptProcessorNode for simplicity in this environment, 
-    // though AudioWorklet is preferred in modern apps.
+    this.analyser = this.audioContext.createAnalyser();
+    this.analyser.fftSize = 256;
+
     this.processor = this.audioContext.createScriptProcessor(2048, 1, 1);
 
     this.processor.onaudioprocess = (e) => {
@@ -26,13 +28,26 @@ export class AudioProcessor {
       onAudioData(base64Data);
     };
 
+    this.source.connect(this.analyser);
     this.source.connect(this.processor);
     this.processor.connect(this.audioContext.destination);
+  }
+
+  getVolume(): number {
+    if (!this.analyser) return 0;
+    const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+    this.analyser.getByteFrequencyData(dataArray);
+    let values = 0;
+    for (let i = 0; i < dataArray.length; i++) {
+      values += dataArray[i];
+    }
+    return values / dataArray.length;
   }
 
   stop() {
     this.processor?.disconnect();
     this.source?.disconnect();
+    this.analyser?.disconnect();
     this.stream?.getTracks().forEach(track => track.stop());
     this.audioContext?.close();
   }
@@ -61,13 +76,17 @@ export class AudioProcessor {
 export class AudioPlayer {
   private audioContext: AudioContext | null = null;
   private nextStartTime: number = 0;
+  private analyser: AnalyserNode | null = null;
 
   constructor(private sampleRate: number = 24000) {
     this.audioContext = new AudioContext({ sampleRate: this.sampleRate });
+    this.analyser = this.audioContext.createAnalyser();
+    this.analyser.fftSize = 256;
+    this.analyser.connect(this.audioContext.destination);
   }
 
   playChunk(base64Data: string) {
-    if (!this.audioContext) return;
+    if (!this.audioContext || !this.analyser) return;
 
     const binaryString = window.atob(base64Data);
     const len = binaryString.length;
@@ -87,7 +106,7 @@ export class AudioPlayer {
 
     const source = this.audioContext.createBufferSource();
     source.buffer = buffer;
-    source.connect(this.audioContext.destination);
+    source.connect(this.analyser);
 
     const currentTime = this.audioContext.currentTime;
     if (this.nextStartTime < currentTime) {
@@ -98,9 +117,23 @@ export class AudioPlayer {
     this.nextStartTime += buffer.duration;
   }
 
+  getVolume(): number {
+    if (!this.analyser) return 0;
+    const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+    this.analyser.getByteFrequencyData(dataArray);
+    let values = 0;
+    for (let i = 0; i < dataArray.length; i++) {
+      values += dataArray[i];
+    }
+    return values / dataArray.length;
+  }
+
   stop() {
     this.audioContext?.close();
     this.audioContext = new AudioContext({ sampleRate: this.sampleRate });
+    this.analyser = this.audioContext.createAnalyser();
+    this.analyser.fftSize = 256;
+    this.analyser.connect(this.audioContext.destination);
     this.nextStartTime = 0;
   }
 }
