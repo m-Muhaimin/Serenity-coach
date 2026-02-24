@@ -1,0 +1,7 @@
+{
+  "name": "Serenity Collective: Voice AI Guides",
+  "description": "A collection of compassionate, wise, and specialized AI guides powered by Gemini Live for real-time, voice-based support.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
