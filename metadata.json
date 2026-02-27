@@ -1,6 +1,6 @@
 {
-  "name": "Serenity Collective: Voice AI Guides",
-  "description": "A collection of compassionate, wise, and specialized AI guides powered by Gemini Live for real-time, voice-based support.",
+  "name": "SuprVoice",
+  "description": "A powerful voice AI platform with a personalized profile system, a skills marketplace, and multi-language support.",
   "requestFramePermissions": [
     "microphone"
   ]

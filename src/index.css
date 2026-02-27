@@ -1,39 +1,47 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-serif: "Cormorant Garamond", serif;
-  --font-sans: "Inter", sans-serif;
+  --font-serif: "Plus Jakarta Sans", sans-serif;
+  --font-sans: "Plus Jakarta Sans", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
   
-  --color-serenity-bg: #F5F5F4; /* Light Paper */
-  --color-serenity-ink: #1A1A1A; /* Deep Ink */
-  --color-serenity-accent: #1A1A1A; /* Monochromatic accent */
-  --color-serenity-muted: #E5E5E4; /* Soft divider */
+  --color-serenity-bg: #FFFFFF;
+  --color-serenity-ink: #1A1A1A;
+  --color-serenity-accent: #000000;
+  --color-serenity-muted: #F9F9F9;
+  
+  --radius-native: 8px;
+  --radius-card: 8px;
 }
 
 body {
-  @apply bg-serenity-bg text-serenity-ink font-sans antialiased;
+  @apply bg-serenity-bg text-serenity-ink font-sans antialiased select-none;
 }
 
 .serif {
-  @apply font-serif;
+  @apply font-sans font-bold;
 }
 
 .mono {
   @apply font-mono;
 }
 
-/* Refined glass card - less radius, subtle shadow */
-.glass-card {
-  @apply bg-white border border-serenity-ink/5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)];
+/* Mobile Native Card */
+.native-card {
+  @apply bg-white rounded-lg border border-black/[0.05] shadow-sm;
 }
 
-/* Atmospheric background - more subtle */
+/* Bottom Sheet Style */
+.bottom-sheet {
+  @apply fixed bottom-0 left-0 right-0 bg-white rounded-t-lg shadow-sm p-4 z-50;
+}
+
+/* Tab Bar Style */
+.tab-bar {
+  @apply fixed bottom-4 left-4 right-4 bg-white rounded-lg border border-black/[0.1] shadow-sm px-4 py-2 flex items-center justify-between z-40;
+}
+
 .atmosphere {
-  background: 
-    radial-gradient(circle at 50% 30%, rgba(26, 26, 26, 0.02) 0%, transparent 60%),
-    radial-gradient(circle at 10% 80%, rgba(26, 26, 26, 0.03) 0%, transparent 50%);
-  filter: blur(40px);
-  opacity: 0.6;
+  display: none;
 }
